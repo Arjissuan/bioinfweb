@@ -1,45 +1,29 @@
 from django.db import models
+from django.contrib.auth.models import User
 
-# Create your models here.
+class Tags(models.Model):
+    title=models.CharField(max_length=100)
+
+class Multimedias(models.Model):
+    picture=models.ImageField()
+
+class Comments(models.Model):
+    contenet=models.TextField(max_length=300)
+    user=models.ForeignKey(to=User, on_delete=models.CASCADE)
+    date=models.DateField()
+
 class Post(models.Model):
-    title = models.CharField(max_length = 30)
-    content = models.TextField(max_length = 10000)
-    author = models.CharField(max_length = 10)
-    date_created = models.DateTimeField(auto_now_add = True)
-    tag = models.ManyToManyField('Tags',blank = True)
-    publish = models.BooleanField(default = False)
+    title=models.CharField(max_length=100)
+    date=models.DateTimeField()
+    content=models.TextField(max_length=300)
+    added_by=models.ForeignKey(to=User, on_delete=models.CASCADE)
+    comments=models.OneToOneField(Comments,on_delete=models.CASCADE)
+    tags=models.ManyToManyField(Tags)
+    multimedias=models.OneToOneField(Multimedias,on_delete=models.CASCADE)
     def __str__(self):
         return self.title
 
 
-class Comment(models.Model):
-    content = models.TextField(max_length = 1000)
-    User = models.CharField(max_length = 10)#to bedzie po prostu do wpisania przez uzytkownika bez potrzeby logowania.
-    post = models.ForeignKey(Post,on_delete = models.CASCADE,related_name = 'comments')
-    date = models.DateTimeField(auto_now_add = True)
-    class Meta:
-        ordering = ['-date']
-    def __str__(self):
-        return self.User + self.date
 
 
-class Multimedia(models.Model):
-    photos = models.ImageField()
-    post = models.ForeignKey(Post,on_delete = models.CASCADE,related_name = 'photos',blank = True) #bedzie mozna dodawac kilka zdjec do jednego posta.
-    galery = models.ForeignKey('Galery',on_delete = models.CASCADE,blank = True)
-
-
-class Tags(models.Model):
-    tagi = models.CharField(max_length = 30)
-
-
-    def __str__(self):
-        return self.tagi
-
-
-class Galery(models.Model):
-
-    OpisGalerii = models.CharField(max_length = 40)
-
-    def __str__(self):
-        return self.OpisGalerii
+# Create your models here.
